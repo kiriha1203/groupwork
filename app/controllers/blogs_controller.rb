@@ -1,5 +1,6 @@
 class BlogsController < ApplicationController
   before_action :set_blog, only: [:show, :edit, :update, :destroy]
+  before_action :login_judge, only: [:create, :edit, :update, :destroy, :new, :show ]
 
   # GET /blogs
   # GET /blogs.json
@@ -24,7 +25,7 @@ class BlogsController < ApplicationController
   # POST /blogs
   # POST /blogs.json
   def create
-    @blog = Blog.new(blog_params)
+    @blog = current_user.blogs.build(blog_params)
 
     respond_to do |format|
       if @blog.save
@@ -70,5 +71,11 @@ class BlogsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def blog_params
       params.require(:blog).permit(:title, :content)
+    end
+
+    def login_judge
+      unless logged_in?
+        redirect_to new_session_path
+      end
     end
 end
